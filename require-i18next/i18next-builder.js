@@ -136,7 +136,7 @@
             }
 
             // Fix module ending slash
-            module += module.substr(module.length-1) !== "/" ? "/" : "";
+            //module += module.substr(module.length-1) !== "/" ? "/" : "";
 
             // Load all needed resources
             options.resStore = options.resStore || {};
