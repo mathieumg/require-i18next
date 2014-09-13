@@ -1,6 +1,6 @@
 /**
  * RequireJS i18next Plugin (builder)
- * 
+ *
  * @version 0.4.0
  * @copyright 2013-2014 Jacob van Mourik
  * @license MIT
@@ -45,12 +45,12 @@
 
     /**
      * Synchronously loads the contents of a file using either nodejs or rhino.
-     * 
+     *
      * @param {String} path The path of the file
      * @returns {String} The contents of the file
      */
     function loadFile(path) {
-        if (typeof process !== "undefined" && process.versions 
+        if (typeof process !== "undefined" && process.versions
                 && !!process.versions.node && !process.versions["node-webkit"]) {
             var file = fs.readFileSync(path, "utf8");
             if (file.indexOf("\uFEFF") === 0) {
@@ -59,8 +59,8 @@
             return file;
         } else {
             var stringBuffer, line,
-                file = new java.io.File(path), 
-                lineSeparator = java.lang.System.getProperty("line.separator"), 
+                file = new java.io.File(path),
+                lineSeparator = java.lang.System.getProperty("line.separator"),
                 input = new java.io.BufferedReader(new java.io.InputStreamReader(new java.io.FileInputStream(file), "utf-8"));
             try {
                 stringBuffer = new java.lang.StringBuffer();
@@ -80,10 +80,10 @@
     }
 
     /**
-     * Parses a resource name into its component parts. 
+     * Parses a resource name into its component parts.
      * For example: resource:namespace1,namespace2 where resource is the path to
      * the locales and the part after the : the additional namespace(s) to load.
-     * 
+     *
      * @param {String} name The resource name
      * @returns {Object} Object containing module name and namespaces
      */
@@ -97,14 +97,14 @@
 
     define({
         load: function(name, req, onload, config) {
-            // Skip the process if i18next resources will not be inlined 
+            // Skip the process if i18next resources will not be inlined
             // or supported languages is not defined
             if (!config.inlineI18next || !config.i18next || !config.i18next.supportedLngs) {
                 onload();
                 return;
             }
 
-            // Currently, inlining resources is only supported for single file builds 
+            // Currently, inlining resources is only supported for single file builds
             if (config.modules.length > 1) {
                 throw new Error("The i18next plugin doesn't support inlining resources for " +
                         "multiple module builds. To proceed, remove the inlineI18next " +
@@ -122,8 +122,12 @@
                 extend(options, data);
             }
 
-            // Add default namespace to namespaces list
-            namespaces.push(options.ns);
+            // Add namespaces to list
+            if (typeof options.ns === "string") {
+                namespaces.push(options.ns);
+            } else if(options.ns.namespaces) {
+                namespaces = namespaces.concat(options.ns.namespaces);
+            }
 
             // Check for scoped supported languages value
             languages = options.supportedLngs;
@@ -139,6 +143,7 @@
             each(languages, function(nss, lng) {
                 options.resStore[lng] = options.resStore[lng] || {};
                 each(nss, function(ns) {
+
                     if (namespaces.indexOf(ns) !== -1) {
                         url = req.toUrl(module + options.resGetPath
                                 .replace(options.interpolationPrefix + "ns" + options.interpolationSuffix, ns)
